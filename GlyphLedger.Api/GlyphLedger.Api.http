@@ -21,7 +21,62 @@ Content-Type: application/json
 
 {
   "username": "test",
-  "password": "test123"
+  "password": "test1234"
 }
+
+###
+
+POST {{GlyphLedger.Api_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "rtkPg0M61+v0SaxVYha5c4PlQuvmwzVBBQLz5mXvoHE="
+}
+
+###
+
+GET {{GlyphLedger.Api_HostAddress}}/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnbHlwaC1sZWRnZXItbW9iaWxlIiwiaXNzIjoiZ2x5cGgtbGVkZ2VyLWFwaSIsImV4cCI6MTc4MjEyNTUzNSwic3ViIjoiNGRjZjYzNWUtN2E0NC00YTg2LWFmNTMtMTFjMDFjNDY2MmM0IiwiaWF0IjoxNzgyMTI0NjM1LCJuYmYiOjE3ODIxMjQ2MzV9.2rLi8bRSvhlOCasujGkt0w8DKPziejfVXuMWx_dZki8
+###
+
+POST {{GlyphLedger.Api_HostAddress}}/api/auth/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnbHlwaC1sZWRnZXItbW9iaWxlIiwiaXNzIjoiZ2x5cGgtbGVkZ2VyLWFwaSIsImV4cCI6MTc4MjEyNzk3MSwic3ViIjoiNGRjZjYzNWUtN2E0NC00YTg2LWFmNTMtMTFjMDFjNDY2MmM0IiwiaWF0IjoxNzgyMTI3MDcxLCJuYmYiOjE3ODIxMjcwNzF9.43nuYyhiCvOGHfpdibxGbEf1X6OgWTjQdLOJyssarEk
+
+{
+  "refreshToken": "GfmSuHKbSHSud1fcIqYHttildCm69DWZMIDXpCKSz34="
+}
+
+###
+
+PUT {{GlyphLedger.Api_HostAddress}}/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnbHlwaC1sZWRnZXItbW9iaWxlIiwiaXNzIjoiZ2x5cGgtbGVkZ2VyLWFwaSIsImV4cCI6MTc4MjEyODAxNiwic3ViIjoiNGRjZjYzNWUtN2E0NC00YTg2LWFmNTMtMTFjMDFjNDY2MmM0IiwiaWF0IjoxNzgyMTI3MTE2LCJuYmYiOjE3ODIxMjcxMTZ9.di4QM7M6wlHyFFau2sCamuMj6fcqZGLPKnnwXrxcaAk
+
+{
+  "currentPassword": "test123",
+  "newPassword": "test1234"
+}
+
+###
+GET {{GlyphLedger.Api_HostAddress}}/api/scans/my-scans
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnbHlwaC1sZWRnZXItbW9iaWxlIiwiaXNzIjoiZ2x5cGgtbGVkZ2VyLWFwaSIsImV4cCI6MTc4MjEzNTcxMiwic3ViIjoiNGRjZjYzNWUtN2E0NC00YTg2LWFmNTMtMTFjMDFjNDY2MmM0IiwiaWF0IjoxNzgyMTM0ODEyLCJuYmYiOjE3ODIxMzQ4MTJ9.pJAwU9UVV7QXFk3mwIu0SJ3M8m2ZQix3XJ70bZxskZ8
+
+###
+
+POST {{GlyphLedger.Api_HostAddress}}/api/scans/save-scan
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnbHlwaC1sZWRnZXItbW9iaWxlIiwiaXNzIjoiZ2x5cGgtbGVkZ2VyLWFwaSIsImV4cCI6MTc4MjEzNTcxMiwic3ViIjoiNGRjZjYzNWUtN2E0NC00YTg2LWFmNTMtMTFjMDFjNDY2MmM0IiwiaWF0IjoxNzgyMTM0ODEyLCJuYmYiOjE3ODIxMzQ4MTJ9.pJAwU9UVV7QXFk3mwIu0SJ3M8m2ZQix3XJ70bZxskZ8
+
+{
+  "content": "https://www.usersconnect.cloudomair.org",
+  "format": "qr",
+  "valueType": "website"
+}
+
+###
+
+DELETE {{GlyphLedger.Api_HostAddress}}/api/scans/11380891-7ec4-4ace-955b-9370121330cd
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnbHlwaC1sZWRnZXItbW9iaWxlIiwiaXNzIjoiZ2x5cGgtbGVkZ2VyLWFwaSIsImV4cCI6MTc4MjEzNTcxMiwic3ViIjoiNGRjZjYzNWUtN2E0NC00YTg2LWFmNTMtMTFjMDFjNDY2MmM0IiwiaWF0IjoxNzgyMTM0ODEyLCJuYmYiOjE3ODIxMzQ4MTJ9.pJAwU9UVV7QXFk3mwIu0SJ3M8m2ZQix3XJ70bZxskZ8
 
 ###

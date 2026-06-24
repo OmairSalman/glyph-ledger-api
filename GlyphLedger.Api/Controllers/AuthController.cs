@@ -2,6 +2,7 @@
 using GlyphLedger.Api.DTOs;
 using GlyphLedger.Api.Models;
 using GlyphLedger.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace GlyphLedger.Api.Controllers
         {
             bool exists = await _context.Users.AnyAsync(u => u.Username == request.Username);
             if (exists) return Conflict("Username is already taken");
+            if (request.Password.Length < 6) return BadRequest("Password must be at least 6 characters long");
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new()
             {
@@ -66,6 +68,28 @@ namespace GlyphLedger.Api.Controllers
             });
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh(RefreshRequest request)
+        {
+            var rt = await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == request.RefreshToken);
+            if (rt == null) return Unauthorized("Invalid refresh token");
+            if (rt.ExpiresAt <= DateTime.UtcNow)
+            {
+                _context.RefreshTokens.Remove(rt);
+                await _context.SaveChangesAsync();
+                return Unauthorized("Invalid refresh token");
+            }
+            var userId = rt.UserId;
+            var (accessToken, refreshToken) = IssueTokensFor(userId);
+            _context.RefreshTokens.Remove(rt);
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                accessToken,
+                refreshToken
+            });
+        }
+
         private (string accessToken, string refreshToken) IssueTokensFor(Guid userId)
         {
             var accessToken = _tokenService.CreateAccessToken(userId);
@@ -79,6 +103,64 @@ namespace GlyphLedger.Api.Controllers
             };
             _context.RefreshTokens.Add(rt);
             return (accessToken, refreshToken);
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> Me()
+        {
+            var sub = User.FindFirst("sub")?.Value!;
+            var userId = Guid.Parse(sub);
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound("User not found");
+            return Ok(new
+            {
+                user.Id,
+                user.Name,
+                user.Username
+            });
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout(LogoutRequest request)
+        {
+            var sub = User.FindFirst("sub")?.Value!;
+            var userId = Guid.Parse(sub);
+            var rt = await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == request.RefreshToken && r.UserId == userId);
+            if (rt != null)
+            {
+                _context.RefreshTokens.Remove(rt);
+                await _context.SaveChangesAsync();
+            }
+            return NoContent();
+        }
+
+        [HttpPut("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+        {
+            var sub = User.FindFirst("sub")?.Value!;
+            var userId = Guid.Parse(sub);
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound("User not found");
+            var passwordValid = BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash);
+            if (!passwordValid) return Unauthorized("Invalid password");
+            if (request.NewPassword == request.CurrentPassword) return BadRequest("New password is the same as the old password");
+            if (request.NewPassword.Length < 6) return BadRequest("Password must be at least 6 characters long");
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+            var userTokens = await _context.RefreshTokens
+                .Where(rt => rt.UserId == userId)
+                .ToListAsync();
+            _context.RefreshTokens.RemoveRange(userTokens);
+            var (accessToken, refreshToken) = IssueTokensFor(user.Id);
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                accessToken,
+                refreshToken
+            });
         }
     }
 }
