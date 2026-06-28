@@ -145,7 +145,7 @@ namespace GlyphLedger.Api.Controllers
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return NotFound("User not found");
             var passwordValid = BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash);
-            if (!passwordValid) return Unauthorized("Invalid password");
+            if (!passwordValid) return Unauthorized("Invalid current password");
             if (request.NewPassword == request.CurrentPassword) return BadRequest("New password is the same as the old password");
             if (request.NewPassword.Length < 6) return BadRequest("Password must be at least 6 characters long");
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);

@@ -33,6 +33,15 @@ builder.Services
         // Keep raw JWT claim names instead of legacy WS-Fed remapping — so "sub" stays "sub"
         options.MapInboundClaims = false;
     });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://192.168.1.3:8650","http://localhost", "https://localhost")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -42,7 +51,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();   // who are you? (reads + validates the token → builds User)
 
