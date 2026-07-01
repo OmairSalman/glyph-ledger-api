@@ -11,7 +11,7 @@ namespace GlyphLedger.Api.Data
         public DbSet<Scan> Scans { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
-        //forcing usernames to be unique through a DB index, by overriding the OnModelCreating method from DbContext
+        //forcing usernames and refresh tokens to be unique through a DB index, by overriding the OnModelCreating method from DbContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
